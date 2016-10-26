@@ -3,7 +3,6 @@ from time import sleep
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
-
 class HackerRank(object):
 	def __init__(self, username, password):
 		self.username = username
@@ -42,10 +41,8 @@ class HackerRank(object):
 		for prb in prbs:
 			if prb.find('i', {'class': 'icon-ok'}):
 				n = prb.find('a', {'data-attr1': True })['data-attr1']
-				print c, n
 				self.Save(n, name)
 				c += 1
-
 
 	def Save(self, name, d):
 		url = 'https://www.hackerrank.com/challenges/{}/submissions'.format(name)
@@ -82,11 +79,13 @@ class HackerRank(object):
 
 		with codecs.open(d + '/' + name + ext, 'w', 'utf-8') as file:
 			file.write(source)
+		print d + '/' + name + ext
 
 if __name__ == '__main__':
 	hackerrank = HackerRank('username', 'password')
 	hackerrank.Login()
 
+	# Page Numbers
 	l = { 'implementation': 4, 'warmup': 1, 'constructive-algorithms': 1,
 		  'strings': 4, 'arrays-and-sorting': 2, 'search':2, 'graph-theory': 6,
 		  'greedy': 2, 'dynamic-programming': 9, 'bit-manipulation': 3,
