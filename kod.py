@@ -20,7 +20,6 @@ class HackerRank(object):
 		username = self.browser.find_element_by_xpath('//input[@name="login"]')
 		username.send_keys(self.username)
 
-
 		password = self.browser.find_elements_by_css_selector('input[name="password"]')[1]
 		password.send_keys(self.password)
 
@@ -30,13 +29,13 @@ class HackerRank(object):
 		self.browser.implicitly_wait(5)
 
 	def List(self, name, i):
-		url = 'https://www.hackerrank.com/domains/algorithms/{}/difficulty/all/page/{}'.format(name, i)
+		url = 'https://www.hackerrank.com/domains/algorithms/{}/page:{}'.format(name, i)
 		self.browser.get(url)
 		sleep(5)
 
-		soup = BeautifulSoup(self.browser.page_source)
-		prbs = soup.findAll('div', {'class': 'content--list track_content '})
-
+		soup = BeautifulSoup(self.browser.page_source, "html.parser")
+		prbs = soup.findAll('div', {'class': 'content--list_body'})
+		
 		c = 1
 		for prb in prbs:
 			if prb.find('i', {'class': 'icon-ok'}):
@@ -50,11 +49,10 @@ class HackerRank(object):
 		if name + '.py' in os.listdir(d): return
 		if name + '.cpp' in os.listdir(d): return
 
-
 		self.browser.get(url)
 		sleep(5)
 
-		soup = BeautifulSoup(self.browser.page_source)
+		soup = BeautifulSoup(self.browser.page_source, "html.parser")
 		divs = soup.findAll('div', {'class': 'submissions-list-view'})
 
 		surl = None
@@ -70,7 +68,7 @@ class HackerRank(object):
 		self.browser.get(surl)
 		sleep(5)
 
-		soup = BeautifulSoup(self.browser.page_source)
+		soup = BeautifulSoup(self.browser.page_source, "html.parser")
 		pres = soup.findAll('pre')
 
 		source = u''
@@ -86,10 +84,10 @@ if __name__ == '__main__':
 	hackerrank.Login()
 
 	# Page Numbers
-	l = { 'implementation': 4, 'warmup': 1, 'constructive-algorithms': 1,
+	l = { 'implementation': 5, 'warmup': 1, 'constructive-algorithms': 1,
 		  'strings': 4, 'arrays-and-sorting': 2, 'search':2, 'graph-theory': 6,
-		  'greedy': 2, 'dynamic-programming': 9, 'bit-manipulation': 3,
-		  'game-theory': 3, 'np-complete-problems': 1}
+		  'greedy': 3, 'dynamic-programming': 9, 'bit-manipulation': 3,
+		  'game-theory': 3, 'np-complete-problems': 1, 'recursion': 1}
 
 	for name in l:
 		try: os.mkdir(name)
