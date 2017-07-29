@@ -1,6 +1,6 @@
 # HackerRank
 
-Python and C++ Solutions of 219 Hackerrank Problems in variety of categories.
+Python and C++ Solutions of 274 Hackerrank Problems in variety of categories.
 
     Warmup: 10
     Implementation: 64
