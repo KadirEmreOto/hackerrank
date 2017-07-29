@@ -149,8 +149,6 @@ class HackerRank(object):
 
 if __name__ == '__main__':
     hackerrank = HackerRank()
-    hackerrank.login('keoto', '1837837')
-    # hackerrank.save_all()
-    hackerrank.save('graph-theory', 'primsmstsub')
-    hackerrank.save('dynamic-programming', 'fair-cut')
+    hackerrank.login('username', 'password')
+    hackerrank.save_all()
     hackerrank.close()
