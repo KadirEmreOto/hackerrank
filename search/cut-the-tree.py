@@ -1,4 +1,7 @@
-import sys, resource, os
+import os
+import resource
+import sys
+
 sys.setrecursionlimit(100005)
 
 resource.setrlimit(resource.RLIMIT_STACK, (65532000, 65532000))
@@ -13,11 +16,12 @@ def dfs(nd, pre):
     
     return sum_[nd-1]
 
+
 def dfs2(nd, pre):
     global answer
     for it in tree[nd]:
         if it != pre:
-            answer=min(answer, abs(sum_[0]-2*sum_[it-1]))
+            answer = min(answer, abs(sum_[0]-2*sum_[it-1]))
             dfs2(it, nd)
 
 answer = 10**9
@@ -29,7 +33,7 @@ sum_ = [0]*N
 tree = {}
 binary = []
 for i in xrange(N-1):
-    T1 , T2 = map(int, raw_input().strip().split())
+    T1, T2 = map(int, raw_input().strip().split())
     binary.append((T1, T2))
     if T1 in tree:
         if T2 not in tree[T1]:

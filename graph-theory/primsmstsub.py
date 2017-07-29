@@ -1,18 +1,18 @@
 
 def find(vertice):
-    if parent[vertice] != vertice:
-        parent[vertice] = find(parent[vertice])
-    return parent[vertice]
+    if parent[vertice] != vertice:
+        parent[vertice] = find(parent[vertice])
+    return parent[vertice]
 
 def union(vertice1, vertice2):
-    root1 = find(vertice1)
-    root2 = find(vertice2)
-    if root1 != root2:
-        if rank[root1] > rank[root2]:
-            parent[root2] = root1
-        else:
-            parent[root1] = root2
-            if rank[root1] == rank[root2]: rank[root2] += 1
+    root1 = find(vertice1)
+    root2 = find(vertice2)
+    if root1 != root2:
+        if rank[root1] > rank[root2]:
+            parent[root2] = root1
+        else:
+            parent[root1] = root2
+            if rank[root1] == rank[root2]: rank[root2] += 1
 
 
 N, M = map(int, raw_input().split())

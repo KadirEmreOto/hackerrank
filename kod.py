@@ -1,98 +1,156 @@
-import os, codecs
-from time import sleep
-from selenium import webdriver
+import os
+import codecs
+# from time import sleep
 from bs4 import BeautifulSoup
 
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+
+
 class HackerRank(object):
-	def __init__(self, username, password):
-		self.username = username
-		self.password = password
+    def __init__(self):
+        self.site = 'http://www.hackerrank.com'
+        self.delay = 10
 
-		self.site = 'http://www.hackerrank.com'
-		self.delay = 5
+        self.username = None
+        self.password = None
 
-		self.browser = webdriver.Firefox()
+        self.browser = webdriver.PhantomJS(executable_path="/Users/KEO/Documents/phantomjs/bin/phantomjs")
+        # self.browser = webdriver.Firefox()
 
-	def Login(self):
-		url = 'https://www.hackerrank.com/login'
-		self.browser.get(url)
+    def login(self, username, password):
+        url = 'https://www.hackerrank.com/login'
+        self.browser.get(url)
 
-		username = self.browser.find_element_by_xpath('//input[@name="login"]')
-		username.send_keys(self.username)
+        user_input = self.browser.find_element_by_xpath('//input[@name="login"]')
+        user_input.send_keys(username)
 
-		password = self.browser.find_elements_by_css_selector('input[name="password"]')[1]
-		password.send_keys(self.password)
+        pass_input = self.browser.find_elements_by_css_selector('input[name="password"]')[1]
+        pass_input.send_keys(password)
 
-		submit = self.browser.find_element_by_xpath('//button[@class="btn btn-primary login-button auth"]')
-		submit.click()
+        submit = self.browser.find_element_by_xpath('//button[@class="btn btn-primary login-button auth"]')
+        submit.click()
 
-		self.browser.implicitly_wait(5)
+        WebDriverWait(self.browser, self.delay).until(
+            lambda x: x.find_element_by_xpath('//div[@class="dropdown dropdown dropdown-auth profile-menu"]')
+        )
 
-	def List(self, name, i):
-		url = 'https://www.hackerrank.com/domains/algorithms/{}/page:{}'.format(name, i)
-		self.browser.get(url)
-		sleep(5)
+        self.username = username
+        self.password = password
 
-		soup = BeautifulSoup(self.browser.page_source, "html.parser")
-		prbs = soup.findAll('div', {'class': 'content--list_body'})
-		
-		c = 1
-		for prb in prbs:
-			if prb.find('i', {'class': 'icon-ok'}):
-				n = prb.find('a', {'data-attr1': True })['data-attr1']
-				self.Save(n, name)
-				c += 1
+        print("[+] Logged In!")
 
-	def Save(self, name, d):
-		url = 'https://www.hackerrank.com/challenges/{}/submissions'.format(name)
+    def get_domains(self):
+        url = 'https://www.hackerrank.com/domains/algorithms'
+        self.browser.get(url)
 
-		if name + '.py' in os.listdir(d): return
-		if name + '.cpp' in os.listdir(d): return
+        ul = WebDriverWait(self.browser, self.delay).until(
+            lambda x: x.find_element_by_id('challengeAccordion')
+        )
 
-		self.browser.get(url)
-		sleep(5)
+        domains = map(lambda x: x.get_attribute('data-attr1'), ul.find_elements_by_tag_name('a'))
 
-		soup = BeautifulSoup(self.browser.page_source, "html.parser")
-		divs = soup.findAll('div', {'class': 'submissions-list-view'})
+        return list(domains)
 
-		surl = None
-		ext = None
-		for div in divs:
-			if 'Accepted' in div.text:
-				if 'Python' in div.text: ext = '.py'
-				elif 'PyPy' in div.text: ext = '.py'
-				else: ext = '.cpp'
-				surl = self.site + '/' + div.findAll('a')[1]['href']
-				break
+    def get_solved_challenges(self, category):
+        url = 'https://www.hackerrank.com/domains/algorithms/{}/{}?filters=status%3Asolved'
+        self.browser.get(url.format(category, 1))
 
-		self.browser.get(surl)
-		sleep(5)
+        try:
+            last = int(WebDriverWait(self.browser, self.delay).until(
+                lambda x: x.find_element_by_xpath('//li[@class="page-item last-item"]')
+            ).text.strip())
+        except:
+            last = 1
 
-		soup = BeautifulSoup(self.browser.page_source, "html.parser")
-		pres = soup.findAll('pre')
+        challenges = set()
 
-		source = u''
-		for pre in pres:
-			source += pre.text.replace(u'\u200b', u'') + '\n'
+        for page in range(1, last + 1):
+            if page != 1:
+                self.browser.get(url.format(category, page))
 
-		with codecs.open(d + '/' + name + ext, 'w', 'utf-8') as file:
-			file.write(source)
-		print d + '/' + name + ext
+            c_list = WebDriverWait(self.browser, self.delay).until(
+                lambda x: x.find_element_by_class_name('challenges-list')
+            )
+            a_list = c_list.find_elements_by_tag_name('a')
+
+            for a in a_list:
+                challenges.add(a.get_attribute('data-attr1'))
+
+        return challenges
+
+    def save_all(self):
+        domains = self.get_domains()
+
+        for domain in domains:
+            problems = self.get_solved_challenges(domain)
+
+            for problem in problems:
+                try:
+                    self.save(domain, problem)
+                except:
+                    print('[-] Error: Cannot saved:', domain, problem)
+
+    def save(self, category, problem):
+        url = 'https://www.hackerrank.com/challenges/{}/submissions'.format(problem)
+
+        for ext in ['.c', '.cpp', '.py']:
+            if os.path.isfile(os.path.join(category, problem + ext)):
+                return
+
+        self.browser.get(url)
+        WebDriverWait(self.browser, self.delay).until(
+            lambda x: x.find_element_by_xpath('//div[@class="submissions-list-view"]')
+        )
+
+        soup = BeautifulSoup(self.browser.page_source, "html.parser")
+        divs = soup.findAll('div', {'class': 'submissions-list-view'})
+
+        surl = None
+        ext = None
+        for div in divs:
+            if 'Accepted' in div.text:
+                if 'Python' in div.text:
+                    ext = '.py'
+                elif 'PyPy' in div.text:
+                    ext = '.py'
+                else:
+                    ext = '.cpp'
+                surl = self.site + '/' + div.findAll('a')[1]['href']
+                break
+
+        if surl is None:
+            print('[-] Error: {} -> {} cannot be opened!'.format(category, problem))
+            return
+
+        self.browser.get(surl)
+        WebDriverWait(self.browser, self.delay).until(
+            lambda x: x.find_element_by_xpath('//div[@class="CodeMirror-code"]')
+        )
+
+        soup = BeautifulSoup(self.browser.page_source, "html.parser")
+        pres = soup.findAll('pre')
+
+        source = u''
+        for pre in pres:
+            source += pre.text.replace(u'\u200b', u'') + '\n'
+
+        if not os.path.isdir(category):
+            os.mkdir(category)
+
+        with codecs.open(os.path.join(category, problem + ext), 'w', 'utf-8') as stream:
+            stream.write(source)
+
+        print('[+] Saved:', category, '->', problem + ext)
+
+    def close(self):
+        self.browser.close()
+
 
 if __name__ == '__main__':
-	hackerrank = HackerRank('username', 'password')
-	hackerrank.Login()
-
-	# Page Numbers
-	l = { 'implementation': 5, 'warmup': 1, 'constructive-algorithms': 1,
-		  'strings': 4, 'arrays-and-sorting': 2, 'search':2, 'graph-theory': 6,
-		  'greedy': 3, 'dynamic-programming': 9, 'bit-manipulation': 3,
-		  'game-theory': 3, 'np-complete-problems': 1, 'recursion': 1}
-
-	for name in l:
-		try: os.mkdir(name)
-		except: pass
-
-		for i in xrange(l[name]):
-			hackerrank.List(name, i+1)
-	#hackerrank.Save('solve-me-first')
+    hackerrank = HackerRank()
+    hackerrank.login('keoto', '1837837')
+    # hackerrank.save_all()
+    hackerrank.save('graph-theory', 'primsmstsub')
+    hackerrank.save('dynamic-programming', 'fair-cut')
+    hackerrank.close()

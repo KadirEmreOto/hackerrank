@@ -1,13 +1,5 @@
 
-
-if __name__ == '__main__':
-    T = int(raw_input())
-
-    for t0 in xrange(T):
-        a, b = map(int, raw_input().split())
-        if int(a ** 0.5) == a ** 0.5:
-            print int(b ** 0.5) - int(a ** 0.5) + 1
-        else:
-            print int(b ** 0.5) - int(a ** 0.5) 
-
-
+for _ in xrange(int(raw_input())):
+    a, b = map(lambda x: int(x) ** 0.5, raw_input().split())
+    print int(b) - int(a) + a.is_integer()
+    

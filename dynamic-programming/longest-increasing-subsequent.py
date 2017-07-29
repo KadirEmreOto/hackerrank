@@ -1,22 +1,6 @@
-import sys
+from bisect import bisect_left
 
-def readline():
-    return sys.stdin.readline().strip()
-
-def BinarySearch(array, item, start, end):
-    if(start > end): return start
-
-    mid = (start + end) // 2
-
-    if item == array[start]: return start
-    if item == array[mid]  : return mid
-    if item == array[end]  : return end
-
-    if (item < array[mid]): return BinarySearch(array, item, start, mid-1)
-
-    return BinarySearch(array, item, mid+1, end)
-
-def Solve(A):
+def LIS(A):
     length = len(A)
 
     dp = [1]*length
@@ -33,20 +17,17 @@ def Solve(A):
             c[sz + 1] = A[i]
             dp[i] = sz + 1
             sz += 1
-        
+
         else:
-            k = BinarySearch(c, A[i], 1,sz)
+            k = bisect_left(c, A[i], 1,sz)
             c[k] = A[i]
             dp[i] = k
 
     return max(dp)
 
 if __name__ == "__main__":
-    N = int(readline())
+    n = int(raw_input())
+    a = [int(raw_input()) for i in xrange(n)]
 
-    array = []
-    for i in xrange(N):
-        array.append(int(readline()))
+    print LIS(a)
 
-    result = Solve(array)
-    print result
