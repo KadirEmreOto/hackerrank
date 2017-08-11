@@ -15,8 +15,7 @@ class HackerRank(object):
         self.username = None
         self.password = None
 
-        self.browser = webdriver.PhantomJS(executable_path="/Users/KEO/Documents/phantomjs/bin/phantomjs")
-        # self.browser = webdriver.Firefox()
+        self.browser = webdriver.Firefox()
 
     def login(self, username, password):
         url = 'https://www.hackerrank.com/login'
@@ -150,5 +149,8 @@ class HackerRank(object):
 if __name__ == '__main__':
     hackerrank = HackerRank()
     hackerrank.login('username', 'password')
-    hackerrank.save_all()
+    # hackerrank.save_all()
+    hackerrank.save('game-theory', 'stone-piles')
+    hackerrank.save('greedy', 'fighting-pits')
+    hackerrank.save('recursion', 'k-factorization')
     hackerrank.close()

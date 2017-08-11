@@ -1,6 +1,6 @@
 # HackerRank
 
-Python and C++ Solutions of 219 Hackerrank Problems in variety of categories.
+Python and C++ Solutions of 278 Hackerrank Problems in variety of categories.
 
     Warmup: 10
     Implementation: 64
@@ -9,11 +9,11 @@ Python and C++ Solutions of 219 Hackerrank Problems in variety of categories.
     Sorting: 17
     Search: 14
     Graph Theory: 22
-    Greedy: 20
+    Greedy: 21
     Dynamic Programming: 43
     Bit Manipulation: 19
-    Game Theory: 22
-    Recursion: 7
+    Game Theory: 23
+    Recursion: 8
     NP Complete: 3
 
 
