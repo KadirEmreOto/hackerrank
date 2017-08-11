@@ -1,8 +1,5 @@
+.idea/
 .DS_Store
 *.pyc
-.idea/hackerrank.iml
-.idea/misc.xml
-.idea/modules.xml
-.idea/workspace.xml
 geckodriver.log
 ghostdriver.log
